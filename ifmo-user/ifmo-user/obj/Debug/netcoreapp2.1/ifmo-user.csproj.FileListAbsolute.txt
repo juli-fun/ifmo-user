@@ -1,0 +1,11 @@
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/bin/Debug/netcoreapp2.1/ifmo-user.deps.json
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/bin/Debug/netcoreapp2.1/ifmo-user.runtimeconfig.json
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/bin/Debug/netcoreapp2.1/ifmo-user.runtimeconfig.dev.json
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/bin/Debug/netcoreapp2.1/ifmo-user.dll
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/bin/Debug/netcoreapp2.1/ifmo-user.pdb
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.csprojAssemblyReference.cache
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.csproj.CoreCompileInputs.cache
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.AssemblyInfoInputs.cache
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.AssemblyInfo.cs
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.dll
+/Users/juli-fun/ifmo-user/ifmo-user/ifmo-user/obj/Debug/netcoreapp2.1/ifmo-user.pdb
