@@ -2,6 +2,11 @@
 using System.Security.Cryptography; // для md5
 using System.Text; // для md5
 
+// для сохранения объектов в JSON 
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.IO;
+
 namespace ifmo_user
 {
     class Program
@@ -18,9 +23,30 @@ namespace ifmo_user
             Console.WriteLine("ФИО сокращенно: " + User1.Get_Short_Initials());
             // Выводим возраст
             Console.WriteLine("Возраст: " + User1.Get_Age());
+
+            // Далее идет сохранение в JSON
+            //
+            // создаем DataContractJsonSerializer 
+            DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(User));
+
+            // создаем поток (json файл) 
+            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            {
+                // сериализация (сохранение объекта в поток) 
+                formatter.WriteObject(fs, User1);
+            }
+
+            // открываем поток (json файл) 
+            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            {
+                // десериализация (создание объекта из потока) 
+                var saved_user = (User)formatter.ReadObject(fs);
+            }
+
         }
     }
 
+    [Serializable]
     public class User
     {
         // TODO: сделать геттеры и сеттеры для всех public-атрибутров
