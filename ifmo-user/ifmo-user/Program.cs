@@ -52,7 +52,7 @@ namespace ifmo_user
     [Serializable]
     public class User
     {
-        private string email, login, fname, name, lname, auth_key;
+        private string email, login, fname, name, lname, auth_key = "";
         private DateTime created_at, updated_at, birth_date;
         private bool is_blocked = false;
         private bool is_authorized = false;
@@ -157,21 +157,41 @@ namespace ifmo_user
             }
         }
 
+        public string GetKey()
+        {
+            if (is_authorized)
+            {
+                auth_key = RandomPassword.Generate(10);
+                return auth_key;
+            }
+            else { return ""; }
+        }
+
+        public int RevokeKey()
+        {
+            if (is_authorized)
+            {
+                auth_key = "";
+                return 0;
+            }
+            else { return 1; }
+        }
+
         // Авторизация по ключу
         public int Auth_by_Key (string _auth_key)
         {
-            // TODO: Реализовать полноценную авториазцию по ключу. Тут для
-            // примера реализуем авторищзацию по md5-хэшу (хотя это небезопасно)
+            // Ключа нет - авторизации нет
+            if (auth_key == "") return 1;
 
-            if (_auth_key == password_md5)
+            if (_auth_key == auth_key)
             {
                 is_authorized = true;
-                Console.WriteLine("Authorized!");
+                Console.WriteLine("Authorized by key!");
                 return 0;
             }
             else
             {
-                Console.WriteLine("Not authorized!");
+                Console.WriteLine("Not authorized by key!");
                 return 1;
             }
         }
