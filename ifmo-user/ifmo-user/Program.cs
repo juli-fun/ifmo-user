@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic; // для List
 using System.Security.Cryptography; // для md5
 using System.Text; // для md5
 
@@ -16,35 +17,49 @@ namespace ifmo_user
     {
         static void Main(string[] args)
         {
+            // Создаем список пользователей
+            List<User> Users = new List<User>();
+
             // Создаем тестового пользователя
-            var User1 = new User("berezhkov@ifmo.ru",
-            "berezhkov", "", "Бережков", "Андрей", "Вячеславович");
+            Users.Add (new User("berezhkov@ifmo.ru",
+            "berezhkov", "P@ssw0rd#123", "Бережков", "Андрей", "Вячеславович"));
 
             // Выводим ФИО
-            Console.WriteLine("ФИО полностью: " + User1.Get_Full_Initials());
+            Console.WriteLine("ФИО полностью: " + Users[0].Get_Full_Initials());
             // Выводим сокращенные ФИО
-            Console.WriteLine("ФИО сокращенно: " + User1.Get_Short_Initials());
+            Console.WriteLine("ФИО сокращенно: " + Users[0].Get_Short_Initials());
             // Выводим возраст
-            Console.WriteLine("Возраст: " + User1.Get_Age());
+            Console.WriteLine("Возраст: " + Users[0].Get_Age());
+
+            // Авторизацемя и регистрируемся
+            Users[0].Auth_Passwd("P@ssw0rd#123");
+            Users[0].Register();
+            Console.WriteLine("Пользователь зарегистрирован: " + Users[0].Is_Registered);
 
             // Далее идет сохранение в JSON
             //
             // создаем DataContractJsonSerializer 
             DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(User));
 
-            // создаем поток (json файл) 
-            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            // Сохраняем только авторизаванных пользователей
+            int i = 0;
+            foreach (var _User in Users)
             {
-                // сериализация (сохранение объекта в поток) 
-                formatter.WriteObject(fs, User1);
+                if (_User.Is_Registered)
+                {
+                    using (FileStream fs = new FileStream("user" + i++.ToString() + ".json", FileMode.OpenOrCreate))
+                    {
+                        formatter.WriteObject(fs, _User);
+                    }
+                }
             }
 
-            // открываем поток (json файл) 
-            using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
-            {
-                // десериализация (создание объекта из потока) 
-                var saved_user = (User)formatter.ReadObject(fs);
-            }
+            // Ниже закомментирован код загрузки пользователей
+            //using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            //{
+            // десериализация (создание объекта из потока) 
+            //    var saved_user = (User)formatter.ReadObject(fs);
+            //}
 
         }
     }
@@ -56,6 +71,7 @@ namespace ifmo_user
         private DateTime created_at, updated_at, birth_date;
         private bool is_blocked = false;
         private bool is_authorized = false;
+        private bool is_registered = false;
         private string password_md5;
 
         // Для обновления пользователя мы сделали
@@ -89,6 +105,18 @@ namespace ifmo_user
         {
             get { return lname; }
             set { lname = value; updated_at = DateTime.Now; }
+        }
+
+        public bool Is_Registered
+        {
+            get { return is_registered; }
+            set {; }
+        }
+
+        public bool Is_Blocked
+        {
+            get { return is_blocked; }
+            set {; }
         }
 
         // Cоздание пользователя / регистрация
@@ -147,12 +175,12 @@ namespace ifmo_user
             if (MD5_encode(_password) == password_md5)
             {
                 is_authorized = true;
-                Console.WriteLine("Authorized!");
+                Console.WriteLine("Authorized by password!");
                 return 0;
             }
             else
             {
-                Console.WriteLine("Not authorized!");
+                Console.WriteLine("Not authorized by password!");
                 return 1;
             }
         }
@@ -237,9 +265,31 @@ namespace ifmo_user
                 lname.Substring(0, 1) + ".";
         }
 
+        // Регистрация
+        public int Register()
+        {
+            if (is_authorized)
+            {
+                is_registered = true;
+                return 0;
+            }
+            else { return 1; }
+        }
+
+        // Отмена регистрации
+        public int UnRegister()
+        {
+            if (is_authorized)
+            {
+                is_registered = false;
+                return 0;
+            }
+            else { return 1; }
+        }
+
         // Удаление пользователя реализуется деструктором по умолчанию (~User)
         // и отдельного описания не требует
-        }
+    }
 
     // Класс для генерации паролей
     public class RandomPassword
