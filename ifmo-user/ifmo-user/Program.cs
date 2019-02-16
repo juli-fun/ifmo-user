@@ -49,12 +49,44 @@ namespace ifmo_user
     [Serializable]
     public class User
     {
-        // TODO: сделать геттеры и сеттеры для всех public-атрибутров
-        public string email, login, fname, name, lname, auth_key;
-        public DateTime created_at, updated_at, birth_date;
-        private bool is_blocked;
-        private bool is_authorized;
+        private string email, login, fname, name, lname, auth_key;
+        private DateTime created_at, updated_at, birth_date;
+        private bool is_blocked = false;
+        private bool is_authorized = false;
         private string password_md5;
+
+        // Для обновления пользователя мы сделали
+        // методы set для атрибтов объекта
+
+        public string Email
+        {
+            get { return email; }
+            set { email = value; updated_at = DateTime.Now; }
+        }
+
+        public string Login
+        {
+            get { return login; }
+            set { login = value; updated_at = DateTime.Now; }
+        }
+
+        public string Fname
+        {
+            get { return fname; }
+            set { fname = value; updated_at = DateTime.Now; }
+        }
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; updated_at = DateTime.Now; }
+        }
+
+        public string Lname
+        {
+            get { return lname; }
+            set { lname = value; updated_at = DateTime.Now; }
+        }
 
         // Cоздание пользователя / регистрация
         // Параметры, которые помечены звездочкой (*), - обязательные,
@@ -181,9 +213,6 @@ namespace ifmo_user
 
         // Удаление пользователя реализуется деструктором по умолчанию (~User)
         // и отдельного описания не требует
-
-        // Вместо создания метода обновления пользователя, мы сделали
-        // редактируемыми атрибуты объекта
         }
 
     // Класс для генерации паролей
