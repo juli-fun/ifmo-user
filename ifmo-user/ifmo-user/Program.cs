@@ -7,6 +7,9 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.IO;
 
+// для восстановления пароля
+using System.Net.Mail;
+
 namespace ifmo_user
 {
     class Program
@@ -113,45 +116,35 @@ namespace ifmo_user
                 System.Globalization.CultureInfo.InvariantCulture);
 
             // Хешируем пароль
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(_password);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                // Convert the byte array to hexadecimal string
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-                password_md5 = sb.ToString();
-            }
+            password_md5 = MD5_encode(_password);
 
             // Временные метки
             created_at = DateTime.Now;
             updated_at = DateTime.Now;
         }
 
+        // Служебная функция для создания md5-хэша
+        private string MD5_encode (string _password)
+        {
+            MD5 md5 = MD5.Create();
+
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(_password);
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+            // Convert the byte array to hexadecimal string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+
         // Авторизация по паролю
         public int Auth_Passwd (string _password)
         {
-            var password_to_check = "";
-
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(_password);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                // Convert the byte array to hexadecimal string
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-                password_to_check = sb.ToString();
-            }
-
-            if (password_to_check == password_md5)
+            if (MD5_encode(_password) == password_md5)
             {
                 is_authorized = true;
                 Console.WriteLine("Authorized!");
@@ -186,8 +179,21 @@ namespace ifmo_user
         // Восстановление пароля
         public int Recover_Passwd ()
         {
-            // TODO: отправить ссылку на восстановление пароля на E-Mail и
-            // реализовать метод восстановления пароля по ссылке
+            // Генерируем новый пароль
+            var password = RandomPassword.Generate(10);
+            password_md5 = MD5_encode(password);
+
+            // Отправляем его на почту (надо только указать работающий релей)
+            MailMessage mail = new MailMessage("user@company.com", email);
+            SmtpClient client = new SmtpClient();
+            client.Port = 25;
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.UseDefaultCredentials = false;
+            client.Host = "smtp.company.com";
+            mail.Subject = "Password recovery";
+            mail.Body = "New password: " + password;
+            client.Send(mail);
+
             return 0;
         }
 
