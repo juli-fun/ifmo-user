@@ -11,6 +11,8 @@ using System.IO;
 // для восстановления пароля
 using System.Net.Mail;
 
+using Newtonsoft.Json;
+
 namespace ifmo_user
 {
     class Program
@@ -35,24 +37,36 @@ namespace ifmo_user
             Users[0].Auth_Passwd("P@ssw0rd#123");
             Users[0].Register();
             Console.WriteLine("Пользователь зарегистрирован: " + Users[0].Is_Registered);
+            Users[0].GetKey();
 
-            // Далее идет сохранение в JSON
-            //
-            // создаем DataContractJsonSerializer 
-            DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(User));
+            Users.Add(new User("juli@ifmo.ru",
+            "juli", "P@ssw0rd#124", "Аникиенко", "Юлия", "Владимировна"));
+
+            // Сохраняем юзеров в файл
+            var json = JsonConvert.SerializeObject(Users, Formatting.Indented);
+            Console.WriteLine(json);
+
+            using (StreamWriter sw = new StreamWriter("users.json", false, System.Text.Encoding.Default))
+            {
+                sw.WriteLine(json);
+                sw.Close();
+            }
+
+            string json_fromfile;
+
+            using (StreamReader sr = new StreamReader("users.json"))
+            {
+                json_fromfile = sr.ReadToEnd();
+            }
+
+            var Users_test = JsonConvert.DeserializeObject<List<User>>(json_fromfile);
+            Console.WriteLine("ФИО сокращенно: " + Users_test[1].Get_Short_Initials());
 
             // Сохраняем только авторизаванных пользователей
-            int i = 0;
-            foreach (var _User in Users)
-            {
-                if (_User.Is_Registered)
-                {
-                    using (FileStream fs = new FileStream("user" + i++.ToString() + ".json", FileMode.OpenOrCreate))
-                    {
-                        formatter.WriteObject(fs, _User);
-                    }
-                }
-            }
+            //using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
+            //{
+            //     formatter.WriteObject(fs, Users);
+            //}
 
             // Ниже закомментирован код загрузки пользователей
             //using (FileStream fs = new FileStream("users.json", FileMode.OpenOrCreate))
@@ -67,56 +81,74 @@ namespace ifmo_user
     [Serializable]
     public class User
     {
+        [JsonProperty]
         private string email, login, fname, name, lname, auth_key = "";
+        [JsonProperty]
         private DateTime created_at, updated_at, birth_date;
+        [JsonProperty]
         private bool is_blocked = false;
+        [JsonProperty]
         private bool is_authorized = false;
+        [JsonProperty]
         private bool is_registered = false;
+        [JsonProperty]
         private string password_md5;
 
         // Для обновления пользователя мы сделали
         // методы set для атрибтов объекта
 
+        [JsonIgnore]
         public string Email
         {
             get { return email; }
             set { email = value; updated_at = DateTime.Now; }
         }
 
+        [JsonIgnore]
         public string Login
         {
             get { return login; }
             set { login = value; updated_at = DateTime.Now; }
         }
 
+        [JsonIgnore]
         public string Fname
         {
             get { return fname; }
             set { fname = value; updated_at = DateTime.Now; }
         }
 
+        [JsonIgnore]
         public string Name
         {
             get { return name; }
             set { name = value; updated_at = DateTime.Now; }
         }
 
+        [JsonIgnore]
         public string Lname
         {
             get { return lname; }
             set { lname = value; updated_at = DateTime.Now; }
         }
 
+        [JsonIgnore]
         public bool Is_Registered
         {
             get { return is_registered; }
             set {; }
         }
 
+        [JsonIgnore]
         public bool Is_Blocked
         {
             get { return is_blocked; }
             set {; }
+        }
+
+        public User()
+        {
+
         }
 
         // Cоздание пользователя / регистрация
